@@ -1,9 +1,11 @@
 package Screens;
 
+import DatabaseConnection.DatabaseConnect;
+
 import javax.swing.*;
 
 public class LoginScreen {
-    private JFrame window;
+    private final JFrame window;
 
     public  LoginScreen(){
         window = new JFrame();
@@ -14,5 +16,6 @@ public class LoginScreen {
     }
     public void show(){
         window.setVisible(true);
+        DatabaseConnect.DbConnect();
     }
 }
