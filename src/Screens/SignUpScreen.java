@@ -48,12 +48,12 @@ public class SignUpScreen extends JFrame {
         panel.setBackground(PRIMARY_COLOR);
 
         JLabel titleLabel = new JLabel("City University");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 30));
         titleLabel.setForeground(MAIN_TEXT);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel welcomeLabel = new JLabel("Welcome To CityU");
-        welcomeLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 15));
         welcomeLabel.setForeground(MAIN_TEXT);
         welcomeLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -108,7 +108,7 @@ public class SignUpScreen extends JFrame {
     private void addFormRow(JPanel panel, GridBagConstraints gbc, String labelText, JComponent field, int yPos) {
         JLabel label = new JLabel(labelText);
         label.setForeground(MAIN_TEXT);
-        label.setFont(new Font("Arial", Font.BOLD, 14)); // Bold text for labels
+        label.setFont(new Font("Roboto", Font.BOLD, 14)); // Bold text for labels
         gbc.gridx = 0;
         gbc.gridy = yPos;
         panel.add(label, gbc);
@@ -152,7 +152,7 @@ public class SignUpScreen extends JFrame {
     private void styleButton(JButton button) {
         button.setBackground(Color.BLACK);
         button.setForeground(MAIN_TEXT);
-        button.setBorder(new RoundedBorder(15, Color.BLACK));
+        button.setBorder(new RoundedBorder(25, Color.BLACK));
         button.setPreferredSize(new Dimension(250, 40));
         button.setMaximumSize(new Dimension(250, 40));
         button.setFont(new Font("Arial", Font.BOLD, 14));
