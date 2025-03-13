@@ -72,7 +72,7 @@ public class LoginScreen extends JFrame {
 
     private void validateInput() {
         String email = emailField.getText();
-        String pass = passwordField.getPassword().toString();
+        String pass = new String(passwordField.getPassword());
         if(email.isEmpty() || pass.isEmpty()){
             JOptionPane.showMessageDialog(this,"Check your input and try again!");
         }else{
@@ -82,6 +82,8 @@ public class LoginScreen extends JFrame {
 
     private void loginUser(String email, String pass) {
         boolean loggedIn = false;
+        System.out.println(email);
+        System.out.println(pass);
         for(User user:userList){
 
             if(user.getEmail().equals(email) && user.getPassword().equals((pass))){
@@ -90,9 +92,13 @@ public class LoginScreen extends JFrame {
             }
         }
         if(loggedIn){
-
+            MainScreen mainFrame = new MainScreen();
+            mainFrame.setVisible(true);
+            this.setVisible(false);
         }else {
             JOptionPane.showMessageDialog(this,"Wrong email or Password!Try Again");
+            emailField.setText("");
+            passwordField.setText("");
         }
     }
 
@@ -137,14 +143,14 @@ public class LoginScreen extends JFrame {
     private JTextField createStyledTextField() {
         JTextField field = new JTextField(20);
         styleComponent(field);
-        field.setFont(new Font("Arial", Font.BOLD, 20));
+        field.setFont(new Font("Arial", Font.BOLD, 14));
         return field;
     }
 
     private JPasswordField createStyledPasswordField() {
         JPasswordField field = new JPasswordField(20);
         styleComponent(field);
-        field.setFont(new Font("Arial", Font.BOLD, 14));
+        field.setFont(new Font("Arial", Font.PLAIN, 14));
         return field;
     }
 
@@ -152,7 +158,7 @@ public class LoginScreen extends JFrame {
         component.setBorder(new RoundedBorder(15, Color.WHITE));
         component.setBackground(Color.WHITE);
         component.setOpaque(true);
-        component.setPreferredSize(new Dimension(250, 35));
+        component.setPreferredSize(new Dimension(250, 20));
     }
 
     private void addFormRow(JPanel panel, GridBagConstraints gbc, String labelText, JComponent field, int yPos) {
