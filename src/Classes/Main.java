@@ -1,3 +1,5 @@
+package Classes;
+
 import Screens.LoginScreen;
 
 import javax.swing.*;

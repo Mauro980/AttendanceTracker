@@ -21,7 +21,7 @@ public class SignUpScreen extends JFrame {
         setSize(500, 500);
         setLocationRelativeTo(null);
 
-        // Main panel
+        // Classes.Main panel
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
         mainPanel.setBackground(PRIMARY_COLOR);
