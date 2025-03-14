@@ -24,7 +24,7 @@ public class AdminPanel extends JFrame {
         setSize(400, 500);
         setLocationRelativeTo(null);
 
-        // Main container
+        // Classes.Main container
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         mainPanel.setBackground(PRIMARY_COLOR);

@@ -4,7 +4,7 @@ public class Teacher extends User{
     private int teacherID;
 
     public Teacher(int userID, String name, String password, int teacherID) {
-        super(userID, name, "Teacher", password);
+        super(userID, name, "","Teacher", password);
         this.teacherID = teacherID;
     }
 

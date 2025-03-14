@@ -11,9 +11,6 @@ public class Student {
             this.className = className;
         }
 
-
-
-
         public void viewAttendance() {
             System.out.println(  " is viewing attendance.");
         }
