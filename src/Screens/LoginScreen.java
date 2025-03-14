@@ -7,7 +7,8 @@ import java.awt.geom.RoundRectangle2D;
 
 public class LoginScreen extends JFrame {
 
-    private final Color PRIMARY_COLOR = new Color(0xC8, 0x15, 0x1D);
+    // Updated PRIMARY_COLOR to 0xBF211E
+    private final Color PRIMARY_COLOR = new Color(0xBF211E);
     private final Color SECONDARY_TEXT = new Color(0x96, 0x8D, 0x8D);
     private final Color MAIN_TEXT = Color.WHITE;
 
@@ -18,10 +19,10 @@ public class LoginScreen extends JFrame {
     private void initializeUI() {
         setTitle("City University Registration");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 500);
+        setSize(800, 600);
         setLocationRelativeTo(null);
 
-        // Main panel
+        // Main panel with the new background color
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
         mainPanel.setBackground(PRIMARY_COLOR);
@@ -67,15 +68,15 @@ public class LoginScreen extends JFrame {
     private JPanel createFormPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(PRIMARY_COLOR);
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
 
-        JTextField fullNameField = createStyledTextField();
         JTextField emailField = createStyledTextField();
         JPasswordField passwordField = createStyledPasswordField();
-        JPasswordField confirmPasswordField = createStyledPasswordField();
 
+        // If you have more fields (e.g., fullName, confirmPassword), add them similarly
         addFormRow(panel, gbc, "Email:", emailField, 1);
         addFormRow(panel, gbc, "Password:", passwordField, 2);
 
@@ -85,34 +86,45 @@ public class LoginScreen extends JFrame {
     private JTextField createStyledTextField() {
         JTextField field = new JTextField(20);
         styleComponent(field);
-        field.setFont(new Font("Arial", Font.BOLD, 14)); // Bold text in form fields
+        field.setFont(new Font("Arial", Font.BOLD, 14));
+        field.setForeground(Color.BLACK);
+        // Optional: field.setCaretColor(Color.BLACK);
         return field;
     }
 
     private JPasswordField createStyledPasswordField() {
         JPasswordField field = new JPasswordField(20);
         styleComponent(field);
-        field.setFont(new Font("Arial", Font.BOLD, 14)); // Bold text in password fields
+        field.setFont(new Font("Arial", Font.BOLD, 14));
+        field.setForeground(Color.BLACK);
+        // Optional: field.setCaretColor(Color.BLACK);
         return field;
     }
 
+    /**
+     * Remove or comment out setPreferredSize(...) if the text is getting cut off.
+     * Also changed the border color to GRAY so it’s visible against the white background.
+     */
     private void styleComponent(JComponent component) {
-        component.setBorder(new RoundedBorder(15, Color.WHITE));
+        component.setBorder(new RoundedBorder(15, Color.GRAY));
         component.setBackground(Color.WHITE);
         component.setOpaque(true);
-        component.setPreferredSize(new Dimension(250, 35));
+        // component.setPreferredSize(new Dimension(250, 35)); // Remove if text is clipped
     }
 
     private void addFormRow(JPanel panel, GridBagConstraints gbc, String labelText, JComponent field, int yPos) {
         JLabel label = new JLabel(labelText);
         label.setForeground(MAIN_TEXT);
-        label.setFont(new Font("Roboto", Font.BOLD, 14)); // Bold text for labels
+        label.setFont(new Font("Roboto", Font.BOLD, 14));
+
         gbc.gridx = 0;
         gbc.gridy = yPos;
+        gbc.weightx = 0;
         panel.add(label, gbc);
 
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0; // Let the text field expand horizontally
         panel.add(field, gbc);
     }
 
@@ -124,7 +136,7 @@ public class LoginScreen extends JFrame {
         JButton signUpButton = new JButton("Log In");
         styleButton(signUpButton);
 
-        // Center the button using wrapper panel
+        // Center the button using a wrapper panel
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         centerPanel.setBackground(PRIMARY_COLOR);
         centerPanel.add(signUpButton);
@@ -132,12 +144,25 @@ public class LoginScreen extends JFrame {
         // Centered secondary text
         JPanel secondaryTextPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         secondaryTextPanel.setBackground(PRIMARY_COLOR);
-        JButton existingAccountLink = new JButton("New Student? Sign Up");
-        existingAccountLink.setForeground(SECONDARY_TEXT);
+
+        // Make "Sign Up" white, while "New Student?" remains SECONDARY_TEXT
+        JButton existingAccountLink = new JButton();
+        existingAccountLink.setText(
+                "<html>"
+                        + "<font color='#968D8D'>New Student? </font>"
+                        + "<font color='white'>Sign Up</font>"
+                        + "</html>"
+        );
         existingAccountLink.setBorderPainted(false);
         existingAccountLink.setContentAreaFilled(false);
         existingAccountLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        existingAccountLink.setFont(new Font("Arial", Font.PLAIN, 12));
+        existingAccountLink.setFont(new Font("Arial", Font.BOLD, 12));
+//        Link to the Login page
+        existingAccountLink.addActionListener(e -> {
+            new SignUpScreen();
+            dispose();
+        });
+        secondaryTextPanel.add(existingAccountLink);
         secondaryTextPanel.add(existingAccountLink);
 
         panel.add(centerPanel);
@@ -189,6 +214,6 @@ public class LoginScreen extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new LoginScreen());
+        SwingUtilities.invokeLater(LoginScreen::new);
     }
 }

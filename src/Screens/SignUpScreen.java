@@ -7,7 +7,8 @@ import java.awt.geom.RoundRectangle2D;
 
 public class SignUpScreen extends JFrame {
 
-    private final Color PRIMARY_COLOR = new Color(0xC8, 0x15, 0x1D);
+    // Updated primary color to 0xBF211E
+    private final Color PRIMARY_COLOR = new Color(0xBF211E);
     private final Color SECONDARY_TEXT = new Color(0x96, 0x8D, 0x8D);
     private final Color MAIN_TEXT = Color.WHITE;
 
@@ -18,10 +19,10 @@ public class SignUpScreen extends JFrame {
     private void initializeUI() {
         setTitle("City University Registration");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 500);
+        setSize(800, 600);
         setLocationRelativeTo(null);
 
-        // Main panel
+        // Main panel with PRIMARY_COLOR background
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
         mainPanel.setBackground(PRIMARY_COLOR);
@@ -88,6 +89,7 @@ public class SignUpScreen extends JFrame {
         JTextField field = new JTextField(20);
         styleComponent(field);
         field.setFont(new Font("Arial", Font.BOLD, 14)); // Bold text in form fields
+        field.setForeground(Color.BLACK);
         return field;
     }
 
@@ -95,14 +97,17 @@ public class SignUpScreen extends JFrame {
         JPasswordField field = new JPasswordField(20);
         styleComponent(field);
         field.setFont(new Font("Arial", Font.BOLD, 14)); // Bold text in password fields
+        field.setForeground(Color.BLACK);
         return field;
     }
 
+    // Set a rounded border and ensure the component's background remains white
     private void styleComponent(JComponent component) {
+        // Using a white border here. Change if needed to improve visibility.
         component.setBorder(new RoundedBorder(15, Color.WHITE));
         component.setBackground(Color.WHITE);
         component.setOpaque(true);
-        component.setPreferredSize(new Dimension(250, 35));
+        component.setPreferredSize(new Dimension(250, 45));
     }
 
     private void addFormRow(JPanel panel, GridBagConstraints gbc, String labelText, JComponent field, int yPos) {
@@ -111,10 +116,12 @@ public class SignUpScreen extends JFrame {
         label.setFont(new Font("Roboto", Font.BOLD, 14)); // Bold text for labels
         gbc.gridx = 0;
         gbc.gridy = yPos;
+        gbc.weightx = 0;
         panel.add(label, gbc);
 
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0; // Let the text field expand horizontally
         panel.add(field, gbc);
     }
 
@@ -126,20 +133,29 @@ public class SignUpScreen extends JFrame {
         JButton signUpButton = new JButton("Sign Up");
         styleButton(signUpButton);
 
-        // Center the button using wrapper panel
+        // Center the button using a wrapper panel
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         centerPanel.setBackground(PRIMARY_COLOR);
         centerPanel.add(signUpButton);
 
-        // Centered secondary text
+        // Secondary text with a clickable "Log In" link
         JPanel secondaryTextPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         secondaryTextPanel.setBackground(PRIMARY_COLOR);
-        JButton existingAccountLink = new JButton("Already Have an Account? Sign In");
-        existingAccountLink.setForeground(SECONDARY_TEXT);
+        JButton existingAccountLink = new JButton();
+        // Set HTML so that "Already Have an Account?" uses the secondary color and "Log In" is white.
+        existingAccountLink.setText("<html>"
+                + "<font color='#968D8D'><b>Already Have an Account? </b></font>"
+                + "<font color='white'><b>Log In</b></font>"
+                + "</html>");
         existingAccountLink.setBorderPainted(false);
         existingAccountLink.setContentAreaFilled(false);
         existingAccountLink.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        existingAccountLink.setFont(new Font("Arial", Font.PLAIN, 12));
+        existingAccountLink.setFont(new Font("Arial", Font.BOLD, 12));
+        // When clicked, open the LoginScreen and close the current screen.
+        existingAccountLink.addActionListener(e -> {
+            new LoginScreen();
+            dispose();
+        });
         secondaryTextPanel.add(existingAccountLink);
 
         panel.add(centerPanel);
