@@ -1,6 +1,7 @@
 package Screens;
 import Classes.Brigde;
 import Classes.User;
+import DatabaseConnection.DatabaseConnect;
 
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;
@@ -8,6 +9,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
+import java.sql.Connection;
 import java.util.ArrayList;
 
 public class LoginScreen extends JFrame {
@@ -22,11 +24,13 @@ public class LoginScreen extends JFrame {
     private ArrayList<User> userList;
 
     public LoginScreen() {
+
         initializeUI();
+
     }
 
     private void initializeUI() {
-        loadData();
+
         setTitle("City University Registration");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(500, 500);
@@ -52,12 +56,14 @@ public class LoginScreen extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                validateInput();
+               loadData();
             }
         });
     }
 
     private void loadData() {
         userList = new ArrayList();
+        Connection n =  DatabaseConnect.DbConnect();
         User user1 = new User(101, "Alice Johnson","alice", "Admin", "admin123");
         User user2 = new User(102, "Bob Smith", "ha","Lecturer", "lecturer456");
         User user3 = new User(103, "Charlie Brown", "ja","Student", "student789");
