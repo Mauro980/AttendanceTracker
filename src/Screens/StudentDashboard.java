@@ -16,7 +16,7 @@ public class StudentDashboard extends JFrame {
 
         // ===================== TOP PANEL (RED) =====================
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(new Color(0xBF211E)); // Red background
+        topPanel.setBackground(new Color(0xC8151D)); // Red background
         topPanel.setPreferredSize(new Dimension(900, 60));
 
         // Left side: "STUDENT" label
@@ -99,7 +99,7 @@ public class StudentDashboard extends JFrame {
                 JLabel label = (JLabel) super.getTableCellRendererComponent(
                         table, value, isSelected, hasFocus, row, column);
                 label.setFont(new Font("SansSerif", Font.BOLD, 14));
-                label.setBackground(new Color(0xBF211E));
+                label.setBackground(new Color(0xC8151D));
                 label.setForeground(Color.WHITE);
                 label.setHorizontalAlignment(SwingConstants.CENTER);
                 label.setOpaque(true);
@@ -136,7 +136,7 @@ public class StudentDashboard extends JFrame {
         gpaLabel.setHorizontalAlignment(SwingConstants.CENTER);
         gpaLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         gpaLabel.setOpaque(true);
-        gpaLabel.setBackground(new Color(0xBF211E));
+        gpaLabel.setBackground(new Color(0xC8151D));
         gpaLabel.setForeground(Color.WHITE);
         gpaLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
@@ -153,7 +153,7 @@ public class StudentDashboard extends JFrame {
         cgpaLabel.setHorizontalAlignment(SwingConstants.CENTER);
         cgpaLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         cgpaLabel.setOpaque(true);
-        cgpaLabel.setBackground(new Color(0xBF211E));
+        cgpaLabel.setBackground(new Color(0xC8151D));
         cgpaLabel.setForeground(Color.WHITE);
         cgpaLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 

@@ -16,7 +16,7 @@ public class TeacherDashboard extends JFrame {
 
         // ===================== TOP PANEL (RED) =====================
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBackground(new Color(0xBF211E)); // Red color
+        topPanel.setBackground(new Color(0xC8151D)); // Red color
         topPanel.setPreferredSize(new Dimension(900, 60));
 
         // Left side: "TEACHER" label
@@ -68,7 +68,7 @@ public class TeacherDashboard extends JFrame {
         // Subtitle with red background
         JLabel subTitleLabel = new JLabel("FUNDAMENTAL OF COMPUTATIONAL THINKING : PYTHON", SwingConstants.CENTER);
         subTitleLabel.setOpaque(true);
-        subTitleLabel.setBackground(new Color(0xBF211E)); // Red
+        subTitleLabel.setBackground(new Color(0xC8151D)); // Red
         subTitleLabel.setForeground(Color.WHITE);
         subTitleLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         subTitleLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -123,7 +123,7 @@ public class TeacherDashboard extends JFrame {
                         table, value, isSelected, hasFocus, row, column);
                 label.setHorizontalAlignment(SwingConstants.CENTER);
                 label.setFont(new Font("SansSerif", Font.BOLD, 14));
-                label.setBackground(new Color(0xBF211E));
+                label.setBackground(new Color(0xC8151D));
                 label.setForeground(Color.WHITE);
                 label.setOpaque(true);
                 return label;

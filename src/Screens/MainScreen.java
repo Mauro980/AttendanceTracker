@@ -8,7 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MainScreen extends JFrame {
-    private final Color PRIMARY_COLOR = new Color(0xC8, 0x15, 0x1D); // Red background
+    private final Color PRIMARY_COLOR = new Color(0xC8151D); // Red background
     private final Color TEXT_COLOR = Color.BLACK;
     JButton markAttendanceButton;
     JButton trackAttendanceButton;

@@ -8,7 +8,7 @@ import java.awt.geom.RoundRectangle2D;
 public class SignUpScreen extends JFrame {
 
     // Updated primary color to 0xBF211E
-    private final Color PRIMARY_COLOR = new Color(0xBF211E);
+    private final Color PRIMARY_COLOR = new Color(0xC8151D);
     private final Color SECONDARY_TEXT = new Color(0x96, 0x8D, 0x8D);
     private final Color MAIN_TEXT = Color.WHITE;
 

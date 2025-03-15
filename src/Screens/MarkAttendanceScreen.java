@@ -7,7 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MarkAttendanceScreen extends JFrame {
-    private final Color PRIMARY_COLOR = new Color(0xC8, 0x15, 0x1D);
+    private final Color PRIMARY_COLOR = new Color(0xC8151D);
     private final Color TEXT_COLOR = Color.WHITE;
 
     private JComboBox<String> subjectComboBox;
