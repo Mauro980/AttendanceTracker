@@ -1,8 +1,14 @@
 package Screens;
 
+import Classes.Brigde;
+import Classes.User;
+import DatabaseConnection.UserController;
+
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 
 public class SignUpScreen extends JFrame {
@@ -11,6 +17,10 @@ public class SignUpScreen extends JFrame {
     private final Color PRIMARY_COLOR = new Color(0xC8151D);
     private final Color SECONDARY_TEXT = new Color(0x96, 0x8D, 0x8D);
     private final Color MAIN_TEXT = Color.WHITE;
+    private JTextField txtName;
+    private JTextField txtEmail;
+    private  JPasswordField txtPassword;
+    private  JPasswordField txtPasswordConfirm;
 
     public SignUpScreen() {
         initializeUI();
@@ -72,15 +82,15 @@ public class SignUpScreen extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
 
-        JTextField fullNameField = createStyledTextField();
-        JTextField emailField = createStyledTextField();
-        JPasswordField passwordField = createStyledPasswordField();
-        JPasswordField confirmPasswordField = createStyledPasswordField();
+        txtName = createStyledTextField();
+        txtEmail = createStyledTextField();
+        txtPassword = createStyledPasswordField();
+        txtPasswordConfirm = createStyledPasswordField();
 
-        addFormRow(panel, gbc, "Full Name:", fullNameField, 0);
-        addFormRow(panel, gbc, "Email:", emailField, 1);
-        addFormRow(panel, gbc, "Password:", passwordField, 2);
-        addFormRow(panel, gbc, "Confirm Password:", confirmPasswordField, 3);
+        addFormRow(panel, gbc, "Full Name:", txtName, 0);
+        addFormRow(panel, gbc, "Email:", txtEmail, 1);
+        addFormRow(panel, gbc, "Password:", txtPassword, 2);
+        addFormRow(panel, gbc, "Confirm Password:", txtPasswordConfirm, 3);
 
         return panel;
     }
@@ -133,6 +143,12 @@ public class SignUpScreen extends JFrame {
         JButton signUpButton = new JButton("Sign Up");
         styleButton(signUpButton);
 
+        signUpButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                signUp();
+            }
+        });
         // Center the button using a wrapper panel
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         centerPanel.setBackground(PRIMARY_COLOR);
@@ -163,6 +179,30 @@ public class SignUpScreen extends JFrame {
         panel.add(secondaryTextPanel);
 
         return panel;
+    }
+
+    private void signUp() {
+        String fullName = txtName.getText();
+        String email = txtEmail.getText();
+        String pass = new String(txtPassword.getPassword());
+        String pass2 = new String(txtPasswordConfirm.getPassword());
+
+        if(fullName.isEmpty() || email.isEmpty()){
+            JOptionPane.showMessageDialog(this,"Check your entry and try again");
+        }else{
+            if(!pass.equals(pass2)){
+                JOptionPane.showMessageDialog(this,"Password does not Match. Try again");
+            }else{
+                User user = new User(fullName,email, Brigde.roles[1],pass );
+                UserController.createUser(user);
+                JOptionPane.showMessageDialog(this,"User Added Sucessfuly");
+                txtName.setText("");
+                txtPasswordConfirm.setText("");
+                txtEmail.setText("");
+                txtPassword.setText("");
+
+            }
+        }
     }
 
     private void styleButton(JButton button) {

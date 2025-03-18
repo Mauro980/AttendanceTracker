@@ -1,9 +1,17 @@
 package Screens;
 
+import Classes.Brigde;
+import Classes.User;
+import DatabaseConnection.DatabaseConnect;
+import DatabaseConnection.UserController;
+
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
+import java.util.List;
 
 public class LoginScreen extends JFrame {
 
@@ -11,7 +19,9 @@ public class LoginScreen extends JFrame {
     private final Color PRIMARY_COLOR = new Color(0xC8151D);
     private final Color SECONDARY_TEXT = new Color(0x96, 0x8D, 0x8D);
     private final Color MAIN_TEXT = Color.WHITE;
-
+    private JTextField txtEmail;
+    private  JPasswordField txtPassword;
+    List<User> users;
     public LoginScreen() {
         initializeUI();
     }
@@ -41,6 +51,7 @@ public class LoginScreen extends JFrame {
 
         add(mainPanel);
         setVisible(true);
+        users = UserController.getAllUsers();
     }
 
     private JPanel createTitlePanel() {
@@ -64,7 +75,29 @@ public class LoginScreen extends JFrame {
 
         return panel;
     }
+    private void Login(){
+        String email = txtEmail.getText();
+        String password = new String(txtPassword.getPassword());
 
+        if(email.isEmpty()||password.isEmpty()){
+            JOptionPane.showMessageDialog(this,"Email or Password Field Empty");
+        }else{
+            boolean loogedIn = false;
+            for(User user : users){
+                if(user.getEmail().equals(email) && user.getPassword().equals(password)){
+                    loogedIn = true;
+                    Brigde.loggedUser = user;
+                }
+            }
+            if(!loogedIn){
+                JOptionPane.showMessageDialog(this,"Email or Password incorrect","Warning",1);
+            }else{
+                this.setVisible(false);
+                MainScreen mainS = new MainScreen();
+                mainS.setVisible(true);
+            }
+        }
+    }
     private JPanel createFormPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(PRIMARY_COLOR);
@@ -73,12 +106,12 @@ public class LoginScreen extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
 
-        JTextField emailField = createStyledTextField();
-        JPasswordField passwordField = createStyledPasswordField();
+         txtEmail = createStyledTextField();
+         txtPassword = createStyledPasswordField();
 
         // If you have more fields (e.g., fullName, confirmPassword), add them similarly
-        addFormRow(panel, gbc, "Email:", emailField, 1);
-        addFormRow(panel, gbc, "Password:", passwordField, 2);
+        addFormRow(panel, gbc, "Email:", txtEmail, 1);
+        addFormRow(panel, gbc, "Password:", txtPassword, 2);
 
         return panel;
     }
@@ -135,7 +168,12 @@ public class LoginScreen extends JFrame {
 
         JButton signUpButton = new JButton("Log In");
         styleButton(signUpButton);
-
+        signUpButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Login();
+            }
+        });
         // Center the button using a wrapper panel
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         centerPanel.setBackground(PRIMARY_COLOR);
@@ -215,5 +253,6 @@ public class LoginScreen extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(LoginScreen::new);
+
     }
 }

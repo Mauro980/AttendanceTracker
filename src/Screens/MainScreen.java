@@ -1,5 +1,6 @@
 package Screens;
 
+import Classes.Brigde;
 import DatabaseConnection.DatabaseConnect;
 
 import javax.swing.*;
@@ -17,8 +18,8 @@ public class MainScreen extends JFrame {
     private String userRole;
 
     public MainScreen() {
-        this.userName = "userName";
-        this.userRole = "userRole";
+        this.userName = Brigde.loggedUser.getName();
+        this.userRole = Brigde.loggedUser.getRole();
         initializeUI();
     }
 

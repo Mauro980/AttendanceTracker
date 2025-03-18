@@ -1,11 +1,17 @@
 package Screens;
 
+import Classes.Brigde;
+import Classes.Student;
+import DatabaseConnection.StudentController;
+
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 
-public class AdminPanel extends JFrame {
+public class RegisterStudent extends JFrame {
 
     private final Color PRIMARY_COLOR = new Color(0xC8, 0x15, 0x1D); // Red
     private final Color SECONDARY_TEXT = new Color(0x96, 0x8D, 0x8D); // Gray
@@ -14,7 +20,14 @@ public class AdminPanel extends JFrame {
     private final Font LABEL_FONT = new Font("Arial", Font.BOLD, 12);
     private final Font VALUE_FONT = new Font("Arial", Font.PLAIN, 12);
 
-    public AdminPanel() {
+    private  JTextField txtStudentID;
+    private  JTextField txtName;
+    private  JTextField txtEmail;
+    private  JTextField txtContact;
+    private  JRadioButton radioMale;
+    private JRadioButton radioFemale;
+
+    public RegisterStudent() {
         initializeUI();
     }
 
@@ -53,21 +66,10 @@ public class AdminPanel extends JFrame {
         title.setBorder(BorderFactory.createEmptyBorder(0, 0, 15, 0));
 
         // Toggle buttons
-        JPanel togglePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
-        togglePanel.setBackground(PRIMARY_COLOR);
 
-        JRadioButton teacherBtn = createToggleButton("Teacher", true);
-        JRadioButton studentBtn = createToggleButton("Student", false);
-
-        ButtonGroup group = new ButtonGroup();
-        group.add(teacherBtn);
-        group.add(studentBtn);
-
-        togglePanel.add(teacherBtn);
-        togglePanel.add(studentBtn);
 
         panel.add(title, BorderLayout.NORTH);
-        panel.add(togglePanel, BorderLayout.CENTER);
+        //;
 
         return panel;
     }
@@ -110,15 +112,29 @@ public class AdminPanel extends JFrame {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(PRIMARY_COLOR);
         panel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
+        radioMale = createToggleButton("Male", true);
+        radioFemale = createToggleButton("Female", false);
+        JPanel togglePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
+        togglePanel.setBackground(PRIMARY_COLOR);
 
+
+
+        ButtonGroup group = new ButtonGroup();
+        group.add(radioFemale);
+        group.add(radioMale);
+
+        togglePanel.add(radioFemale);
+        togglePanel.add(radioMale);
+
+        panel.add(togglePanel, BorderLayout.AFTER_LAST_LINE);
         // Form sections
-        panel.add(createSectionPanel("Name", "Value"));
+        panel.add(createSectionPanel("Student ID", ""));
         panel.add(Box.createVerticalStrut(15));
-        panel.add(createSectionPanel("Surname", "Value"));
+        panel.add(createSectionPanel("Name", ""));
         panel.add(Box.createVerticalStrut(15));
-        panel.add(createSectionPanel("Email", "Value"));
+        panel.add(createSectionPanel("Email", ""));
         panel.add(Box.createVerticalStrut(15));
-        panel.add(createSectionPanel("Reference", "Value"));
+        panel.add(createSectionPanel("Contact", ""));
 
         return panel;
     }
@@ -138,10 +154,28 @@ public class AdminPanel extends JFrame {
         panel.setBorder(border);
         panel.setBackground(Color.WHITE);
 
-        JTextField field = new JTextField(value);
-        field.setFont(VALUE_FONT);
-        field.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        panel.add(field, BorderLayout.CENTER);
+        if(label=="Student ID"){
+            txtStudentID = new JTextField(value);
+            txtStudentID.setFont(VALUE_FONT);
+            txtStudentID.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+            panel.add(txtStudentID, BorderLayout.CENTER);
+        }else if(label=="Name"){
+            txtName = new JTextField(value);
+            txtName.setFont(VALUE_FONT);
+            txtName.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+            panel.add(txtName, BorderLayout.CENTER);
+        }else if(label=="Email"){
+            txtEmail = new JTextField(value);
+            txtEmail.setFont(VALUE_FONT);
+            txtEmail.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+            panel.add(txtEmail, BorderLayout.CENTER);
+        }
+        else if(label=="Contact"){
+            txtContact = new JTextField(value);
+            txtContact.setFont(VALUE_FONT);
+            txtContact.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+            panel.add(txtContact, BorderLayout.CENTER);
+        }
 
         return panel;
     }
@@ -158,9 +192,39 @@ public class AdminPanel extends JFrame {
         submitBtn.setPreferredSize(new Dimension(250, 40));
         submitBtn.setFocusPainted(false);
         submitBtn.setOpaque(true);
-
+        submitBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Register();
+            }
+        });
         panel.add(submitBtn);
         return panel;
+    }
+
+    private void Register() {
+        String name = txtName.getText();
+        String email = txtEmail.getText();
+        String contact = txtContact.getText();
+        String id = txtStudentID.getText();
+        String gender;
+        if(radioMale.isSelected()){
+            gender = Brigde.gender[0];
+        }else{
+            gender = Brigde.gender[1];
+        }
+
+        if (name.isEmpty() || email.isEmpty() || contact.isEmpty() || id.isEmpty()) {
+           JOptionPane.showMessageDialog(this,"Please fill in all fields.");
+        } else {
+            Student student = new Student(id,name,gender,email,contact);
+            StudentController.addStudent(student);
+            JOptionPane.showMessageDialog(this,"Student added Successfully!");
+            txtName.setText("");
+            txtStudentID.setText("");
+            txtContact.setText("");
+            txtEmail.setText("");
+        }
     }
 
     // Custom rounded border class
@@ -189,6 +253,6 @@ public class AdminPanel extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new AdminPanel());
+        SwingUtilities.invokeLater(() -> new RegisterStudent());
     }
 }
