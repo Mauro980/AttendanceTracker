@@ -4,6 +4,15 @@ public class Course {
     private String id;
     private String name;
 
+    public Course(String id, String name, int semester) {
+        this.id = id;
+        this.name = name;
+        this.semester = semester;
+    }
+
+    public Course() {
+    }
+
     public String getId() {
         return id;
     }
@@ -27,7 +36,10 @@ public class Course {
     public void setSemester(int semester) {
         this.semester = semester;
     }
-
+    @Override
+    public String toString() {
+        return name;  // ✅ This ensures names appear in JComboBox
+    }
     private int semester;
 }
 

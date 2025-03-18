@@ -46,7 +46,7 @@ public class CourseController {
     }
 
     // Retrieve all courses
-    public List<Course> getAllCourses() {
+    public static List<Course> getAllCourses() {
         List<Course> courses = new ArrayList<>();
         String sql = "SELECT * FROM Courses";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);

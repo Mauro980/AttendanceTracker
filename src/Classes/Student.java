@@ -55,5 +55,9 @@ public class Student {
     public void setContact(String contact) {
         this.contact = contact;
     }
+    @Override
+    public String toString() {
+        return name;  // ✅ This ensures names appear in JComboBox
+    }
 }
 

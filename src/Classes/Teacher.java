@@ -1,23 +1,34 @@
 package Classes;
 
-public class Teacher extends User{
-    private int teacherID;
+public class Teacher extends User {
+    private String department;
+    private String qualification;
 
-    public Teacher(int userID, String name, String password, int teacherID) {
-        super(userID, name, "","Teacher", password);
-        this.teacherID = teacherID;
+    public Teacher(int userID, String name, String email, String password, String department, String qualification) {
+        super(userID, name, email, "Teacher", password); // Role is set as "Teacher"
+        this.department = department;
+        this.qualification = qualification;
     }
 
-
-    public void login() {
-        System.out.println("Teacher " + name + " has logged in.");
+    public String getDepartment() {
+        return department;
     }
 
-    public void takeAttendance() {
-        System.out.println(name + " is taking attendance.");
+    public void setDepartment(String department) {
+        this.department = department;
     }
 
-    public void viewReports() {
-        System.out.println(name + " is viewing reports.");
+    public String getQualification() {
+        return qualification;
+    }
+
+    public void setQualification(String qualification) {
+        this.qualification = qualification;
+    }
+
+    @Override
+    public String toString() {
+        return name + " (" + department + ")"; // Display name in JComboBox
     }
 }
+

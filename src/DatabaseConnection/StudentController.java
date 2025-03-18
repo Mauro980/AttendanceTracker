@@ -53,7 +53,7 @@ public class StudentController {
     }
 
     // Retrieve all students
-    public List<Student> getAllStudents() {
+    public static List<Student> getAllStudents() {
         List<Student> students = new ArrayList<>();
         String sql = "SELECT * FROM Students";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);

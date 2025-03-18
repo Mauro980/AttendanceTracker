@@ -14,7 +14,7 @@ public class EnrollmentController {
     private static final String PASSWORD = "";
 
     // Create a new enrollment record
-    public void enrollStudent(Enrollment enrollment) {
+    public static void enrollStudent(Enrollment enrollment) {
         String sql = "INSERT INTO Enrollment (enrollmentId, studentId, courseId, enrollmentDate) VALUES (?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -30,7 +30,7 @@ public class EnrollmentController {
     }
 
     // Retrieve all enrollments
-    public List<Enrollment> getAllEnrollments() {
+    public static List<Enrollment> getAllEnrollments() {
         List<Enrollment> enrollments = new ArrayList<>();
         String sql = "SELECT * FROM Enrollment";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
@@ -95,7 +95,7 @@ public class EnrollmentController {
     }
 
     // Delete an enrollment
-    public void deleteEnrollment(String enrollmentId) {
+    public static void deleteEnrollment(String enrollmentId) {
         String sql = "DELETE FROM Enrollment WHERE enrollmentId = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
