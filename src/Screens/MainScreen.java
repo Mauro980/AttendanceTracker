@@ -44,7 +44,7 @@ public class MainScreen extends JFrame {
         markAttendanceButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
+                new MarkAttendanceScreen();
             }
         });
     }

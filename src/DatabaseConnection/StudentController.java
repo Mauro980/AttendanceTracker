@@ -31,7 +31,7 @@ public class StudentController {
     }
 
     // Retrieve a student by ID
-    public Student getStudent(String id) {
+    public static Student getStudentById(String id) {
         String sql = "SELECT * FROM Students WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
