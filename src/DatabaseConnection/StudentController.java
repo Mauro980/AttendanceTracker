@@ -104,4 +104,30 @@ public class StudentController {
         }
     }
 
+    public static List<Student> getStudentsByCourse(String courseId) {
+        List<Student> students = new ArrayList<>();
+        String sql = "SELECT s.* FROM Students s " +
+                "JOIN Enrollment e ON s.id = e.studentId " +
+                "WHERE e.courseId = ?";
+
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, courseId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                students.add(new Student(
+                        rs.getString("id"),
+                        rs.getString("name"),
+                        rs.getString("gender"),
+                        rs.getString("email"),
+                        rs.getString("contact")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return students;
+    }
+
 }

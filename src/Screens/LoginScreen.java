@@ -1,8 +1,10 @@
 package Screens;
 
 import Classes.Brigde;
+import Classes.Teacher;
 import Classes.User;
 import DatabaseConnection.DatabaseConnect;
+import DatabaseConnection.TeacherController;
 import DatabaseConnection.UserController;
 
 import javax.swing.*;
@@ -21,7 +23,7 @@ public class LoginScreen extends JFrame {
     private final Color MAIN_TEXT = Color.WHITE;
     private JTextField txtEmail;
     private  JPasswordField txtPassword;
-    List<User> users;
+    List<Teacher> users;
     public LoginScreen() {
         initializeUI();
     }
@@ -51,7 +53,7 @@ public class LoginScreen extends JFrame {
 
         add(mainPanel);
         setVisible(true);
-        users = UserController.getAllUsers();
+        users = TeacherController.getAllTeachers();
     }
 
     private JPanel createTitlePanel() {
@@ -83,10 +85,10 @@ public class LoginScreen extends JFrame {
             JOptionPane.showMessageDialog(this,"Email or Password Field Empty");
         }else{
             boolean loogedIn = false;
-            for(User user : users){
+            for(Teacher user : users){
                 if(user.getEmail().equals(email) && user.getPassword().equals(password)){
                     loogedIn = true;
-                    Brigde.loggedUser = user;
+                    Brigde.loggedTeacher = user;
                 }
             }
             if(!loogedIn){

@@ -1,97 +1,128 @@
 package Screens;
+import Classes.*;
+import DatabaseConnection.AttendanceController;
+import DatabaseConnection.CourseController;
+import DatabaseConnection.StudentController;
+import DatabaseConnection.AttendanceStudentController;
+import DatabaseConnection.TeacherCourseController;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-public class MarkAttendanceScreen extends JFrame {
-    private final Color PRIMARY_COLOR = new Color(0xC8151D);
-    private final Color TEXT_COLOR = Color.WHITE;
-
-    private JComboBox<String> subjectComboBox;
-    private JTable attendanceTable;
+public class MarkAttendanceScreen {
+    private JFrame frame;
+    private JComboBox<String> courseDropdown;
+    private JButton createAttendanceButton;
+    private JPanel studentPanel;
+    private Teacher loggedInTeacher ;
 
     public MarkAttendanceScreen() {
+        loggedInTeacher = Brigde.loggedTeacher;
         initializeUI();
     }
 
     private void initializeUI() {
-        setTitle("Mark Attendance");
-        setSize(600, 400);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame = new JFrame("Mark Attendance");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(500, 400);
+        frame.setLayout(new BorderLayout());
 
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new GridLayout(2, 2));
 
-        JPanel topPanel = createTopPanel();
-        mainPanel.add(topPanel, BorderLayout.NORTH);
+        // Display logged-in teacher
+        JLabel teacherLabel = new JLabel("Teacher: " + loggedInTeacher.getName());
+        topPanel.add(teacherLabel);
 
-        JPanel tablePanel = createTablePanel();
-        mainPanel.add(tablePanel, BorderLayout.CENTER);
+        // Course Dropdown (Courses assigned to logged-in teacher)
+        courseDropdown = new JComboBox<>();
+        loadTeacherCourses();
+        topPanel.add(new JLabel("Select Course:"));
+        topPanel.add(courseDropdown);
 
-        add(mainPanel);
-        setVisible(true);
-    }
+        frame.add(topPanel, BorderLayout.NORTH);
 
-    private JPanel createTopPanel() {
-        JPanel panel = new JPanel();
-        panel.setBackground(PRIMARY_COLOR);
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JLabel selectLabel = new JLabel("Select Subject:");
-        selectLabel.setForeground(TEXT_COLOR);
-        selectLabel.setFont(new Font("Arial", Font.BOLD, 14));
-
-        subjectComboBox = new JComboBox<>(new String[]{"Mathematics", "Physics", "Computer Science"});
-        subjectComboBox.setPreferredSize(new Dimension(200, 30));
-
-        panel.add(selectLabel);
-        panel.add(subjectComboBox);
-
-        return panel;
-    }
-
-    private JPanel createTablePanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-
-        String[] columnNames = {"Date"};
-        Object[][] data = {
-                {"2025-03-01"},
-                {"2025-03-08"},
-                {"2025-03-15"},
-                {"2025-03-22"}
-        };
-
-        DefaultTableModel model = new DefaultTableModel(data, columnNames) {
+        // Create Attendance Button
+        createAttendanceButton = new JButton("Create Attendance Session");
+        createAttendanceButton.addActionListener(new ActionListener() {
             @Override
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        attendanceTable = new JTable(model);
-        attendanceTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
-                    int selectedRow = attendanceTable.getSelectedRow();
-                    if (selectedRow != -1) {
-                        String selectedDate = (String) attendanceTable.getValueAt(selectedRow, 0);
-                        JOptionPane.showMessageDialog(null, "Selected Date: " + selectedDate, "Attendance Details", JOptionPane.INFORMATION_MESSAGE);
-                    }
-                }
+            public void actionPerformed(ActionEvent e) {
+                createAttendanceSession();
             }
         });
-        JScrollPane scrollPane = new JScrollPane(attendanceTable);
+        frame.add(createAttendanceButton, BorderLayout.SOUTH);
 
-        panel.add(scrollPane, BorderLayout.CENTER);
-        return panel;
+        // Student Panel (Where students will be displayed)
+        studentPanel = new JPanel();
+        studentPanel.setLayout(new GridLayout(0, 2));
+        frame.add(new JScrollPane(studentPanel), BorderLayout.CENTER);
+
+        frame.setVisible(true);
+    }
+
+    private void loadTeacherCourses() {
+        List<Course> courses = CourseController.getAllCourses();
+
+
+        List<TeacherCourse> coursesfromT = TeacherCourseController.getCoursesByTeacher(loggedInTeacher.getUserID());
+        List<Course> coursesfromTeacher = new ArrayList<>();
+
+
+        for(Course i:courses){
+            for (TeacherCourse j: coursesfromT){
+                if(j.getCourseID().equals(i.getId())){
+                    coursesfromTeacher.add(i);
+                }
+            }
+        }
+        for (Course course : coursesfromTeacher) {
+            courseDropdown.addItem(course.getId());
+        }
+
+    }
+
+    private void createAttendanceSession() {
+        String selectedCourse = (String) courseDropdown.getSelectedItem();
+        if (selectedCourse == null) {
+            JOptionPane.showMessageDialog(frame, "Please select a course.");
+            return;
+        }
+
+        // Generate Attendance ID (Teacher ID + Date)
+        String date = LocalDate.now().toString();
+        String attendanceId = loggedInTeacher.getUserID() + "-" + date;
+
+        // Create attendance record in memory
+        Attendance attendance = new Attendance(attendanceId, selectedCourse, String.valueOf(loggedInTeacher.getUserID()), date);
+
+        // Load students for attendance
+        loadStudentsForAttendance(attendance);
+    }
+
+    private void loadStudentsForAttendance(Attendance attendance) {
+        studentPanel.removeAll();
+        List<Student> students = StudentController.getStudentsByCourse(attendance.getCourseId());
+
+        for (Student student : students) {
+            JCheckBox attendanceCheckbox = new JCheckBox(student.getName());
+            attendanceCheckbox.setSelected(false);
+            studentPanel.add(attendanceCheckbox);
+
+            attendanceCheckbox.addActionListener(e -> {
+                boolean isPresent = attendanceCheckbox.isSelected();
+                AttendanceStudentController.addAttendance(new AttendanceStudent(attendance.getAttendanceId(), student.getId(), isPresent));
+            });
+        }
+        studentPanel.revalidate();
+        studentPanel.repaint();
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(MarkAttendanceScreen::new);
+        new MarkAttendanceScreen();
     }
 }

@@ -10,6 +10,10 @@ public class Teacher extends User {
         this.qualification = qualification;
     }
 
+    public Teacher(String name, String email, String role, String password) {
+        super(name, email, role, password);
+    }
+
     public String getDepartment() {
         return department;
     }

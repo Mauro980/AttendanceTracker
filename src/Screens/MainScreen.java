@@ -18,8 +18,8 @@ public class MainScreen extends JFrame {
     private String userRole;
 
     public MainScreen() {
-        this.userName = Brigde.loggedUser.getName();
-        this.userRole = Brigde.loggedUser.getRole();
+        this.userName = Brigde.loggedTeacher.getName();
+        this.userRole = Brigde.loggedTeacher.getRole();
         initializeUI();
     }
 
