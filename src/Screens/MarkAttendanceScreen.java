@@ -1,16 +1,12 @@
 package Screens;
 import Classes.*;
-import DatabaseConnection.AttendanceController;
-import DatabaseConnection.CourseController;
-import DatabaseConnection.StudentController;
-import DatabaseConnection.AttendanceStudentController;
-import DatabaseConnection.TeacherCourseController;
+import DatabaseConnection.*;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +14,11 @@ import java.util.List;
 public class MarkAttendanceScreen {
     private JFrame frame;
     private JComboBox<String> courseDropdown;
-    private JButton createAttendanceButton;
-    private JButton scanQRButton;
-    private JPanel studentPanel;
-    private Teacher loggedInTeacher ;
-    private  Attendance newAttendance;
+    private JButton createSessionButton;
+    private JButton finishSessionButton;
+    private JTable studentTable;
+    private Teacher loggedInTeacher;
+    private String currentAttendanceId;
 
     public MarkAttendanceScreen() {
         loggedInTeacher = Brigde.loggedTeacher;
@@ -30,136 +26,178 @@ public class MarkAttendanceScreen {
     }
 
     private void initializeUI() {
-        frame = new JFrame("Mark Attendance");
+        frame = new JFrame("Attendance Session Management");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(500, 400);
+        frame.setSize(1000, 600);
         frame.setLayout(new BorderLayout());
 
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new GridLayout(2, 2));
+        // Top panel with controls
+        JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
 
-        // Display logged-in teacher
-        JLabel teacherLabel = new JLabel("Teacher: " + loggedInTeacher.getName());
-        topPanel.add(teacherLabel);
-
-        // Course Dropdown (Courses assigned to logged-in teacher)
+        // Course selection
+        controlPanel.add(new JLabel("Select Course:"));
         courseDropdown = new JComboBox<>();
         loadTeacherCourses();
-        topPanel.add(new JLabel("Select Course:"));
-        topPanel.add(courseDropdown);
+        controlPanel.add(courseDropdown);
 
-        frame.add(topPanel, BorderLayout.NORTH);
+        // Session buttons
+        createSessionButton = new JButton("Create New Session");
+        createSessionButton.addActionListener(this::createAttendanceSession);
+        controlPanel.add(createSessionButton);
 
-        // Create Attendance Button
-        createAttendanceButton = new JButton("Create Attendance Session");
-        createAttendanceButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                createAttendanceSession();
-            }
-        });
+        finishSessionButton = new JButton("Finish Session");
+        finishSessionButton.setEnabled(false);
+        finishSessionButton.addActionListener(this::finishAttendanceSession);
+        controlPanel.add(finishSessionButton);
 
-        // QR Code Scan Button
-        scanQRButton = new JButton("Scan QR Code");
-        scanQRButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                scanQRCode();
-            }
-        });
+        // Student table
+        studentTable = new JTable();
+        JScrollPane scrollPane = new JScrollPane(studentTable);
+        initializeStudentTable();
 
-        frame.add(createAttendanceButton, BorderLayout.SOUTH);
+        frame.add(controlPanel, BorderLayout.NORTH);
+        frame.add(scrollPane, BorderLayout.CENTER);
 
-        // Student Panel (Where students will be displayed)
-        studentPanel = new JPanel();
-        studentPanel.setLayout(new GridLayout(0, 2));
-        frame.add(new JScrollPane(studentPanel), BorderLayout.CENTER);
-
+//        loadAllStudents();
         frame.setVisible(true);
+    }
+
+    private void initializeStudentTable() {
+        DefaultTableModel model = new DefaultTableModel(
+                new Object[]{"Student ID", "Name", "Email", "Phone"}, 0
+        ) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        studentTable.setModel(model);
     }
 
     private void loadTeacherCourses() {
         List<Course> courses = CourseController.getAllCourses();
+        List<TeacherCourse> teacherCourses = TeacherCourseController.getCoursesByTeacher(loggedInTeacher.getUserID());
 
-
-        List<TeacherCourse> coursesfromT = TeacherCourseController.getCoursesByTeacher(loggedInTeacher.getUserID());
-        List<Course> coursesfromTeacher = new ArrayList<>();
-
-
-        for(Course i:courses){
-            for (TeacherCourse j: coursesfromT){
-                if(j.getCourseID().equals(i.getId())){
-                    coursesfromTeacher.add(i);
+        for (Course course : courses) {
+            for (TeacherCourse tc : teacherCourses) {
+                if (tc.getCourseID().equals(course.getId())) {
+                    courseDropdown.addItem(course.getId());
                 }
             }
         }
-        for (Course course : coursesfromTeacher) {
-            courseDropdown.addItem(course.getId());
-        }
-
     }
 
-    private void createAttendanceSession() {
-        String selectedCourse = (String) courseDropdown.getSelectedItem();
-        if (selectedCourse == null) {
-            JOptionPane.showMessageDialog(frame, "Please select a course.");
-            return;
-        }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss a");
+    private void loadAllStudents() {
+        DefaultTableModel model = (DefaultTableModel) studentTable.getModel();
+        model.setRowCount(0);
 
-        // Generate Attendance ID (Teacher ID + Date)
-        String date = LocalDate.now().format(formatter);
-        String attendanceId = loggedInTeacher.getUserID() + "-" + date;
-
-        // Create attendance record in memory
-        newAttendance = new Attendance(attendanceId, selectedCourse, String.valueOf(loggedInTeacher.getUserID()), date);
-
-        // Load students for attendance
-        loadStudentsForAttendance(newAttendance);
-    }
-
-    private void loadStudentsForAttendance(Attendance attendance) {
-        studentPanel.removeAll();
-        List<Student> students = StudentController.getStudentsByCourse(attendance.getCourseId());
-        if(!students.isEmpty()){
-            AttendanceController.addAttendance(newAttendance);
-        }
+        List<Student> students = StudentController.getAllStudents();
         for (Student student : students) {
-            JCheckBox attendanceCheckbox = new JCheckBox(student.getName());
-            attendanceCheckbox.setSelected(false);
-            studentPanel.add(attendanceCheckbox);
-
-            attendanceCheckbox.addActionListener(e -> {
-                boolean isPresent = attendanceCheckbox.isSelected();
-                AttendanceStudentController.addAttendance(new AttendanceStudent(attendance.getAttendanceId(), student.getId(), isPresent));
+            model.addRow(new Object[]{
+                    student.getId(),
+                    student.getName(),
+                    student.getEmail(),
+                    student.getContact()
             });
         }
-        studentPanel.revalidate();
-        studentPanel.repaint();
     }
-    private void scanQRCode() {
-        String studentId = "" ;// Simulate scanning process
-        if (studentId != null) {
-            Student student = StudentController.getStudentById(studentId);
-            if (student != null) {
-                int confirm = JOptionPane.showConfirmDialog(frame, "Confirm attendance for: " + student.getName(), "Confirm Attendance", JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    String selectedCourse = (String) courseDropdown.getSelectedItem();
-                    if (selectedCourse == null) {
-                        JOptionPane.showMessageDialog(frame, "Please select a course first.");
-                        return;
-                    }
-                    String date = LocalDate.now().toString();
-                    String attendanceId = loggedInTeacher.getUserID() + "-" + date;
-                    AttendanceStudentController.addAttendance(new AttendanceStudent(attendanceId, student.getId(), true));
-                    JOptionPane.showMessageDialog(frame, "Attendance marked successfully for " + student.getName());
-                }
+
+    private void createAttendanceSession(ActionEvent e) {
+        String selectedCourse = (String) courseDropdown.getSelectedItem();
+        if (selectedCourse == null) {
+            JOptionPane.showMessageDialog(frame, "Please select a course first!");
+            return;
+        }
+
+        try {
+            // Generate shorter timestamp format
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+            currentAttendanceId = loggedInTeacher.getUserID() + "_" + LocalDateTime.now().format(formatter);
+
+            // Create and save attendance record first
+            Attendance attendance = new Attendance(
+                    currentAttendanceId,
+                    selectedCourse,
+                    String.valueOf(loggedInTeacher.getUserID()),
+                    LocalDateTime.now()  // Store as LocalDateTime object
+            );
+
+            if (AttendanceController.addAttendance(attendance)) {
+                // Only proceed if attendance was successfully created
+                DefaultTableModel newModel = createAttendanceModel();
+                studentTable.setModel(newModel);
+                finishSessionButton.setEnabled(true);
+                createSessionButton.setEnabled(false);
             } else {
-                JOptionPane.showMessageDialog(frame, "Student not found!");
+                JOptionPane.showMessageDialog(frame, "Failed to create attendance session!");
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(frame, "Error creating session: " + ex.getMessage());
+        }
+    }
+
+    private DefaultTableModel createAttendanceModel() {
+        DefaultTableModel model = new DefaultTableModel(
+                new Object[]{"Student ID", "Name", "Present"}, 0
+        ) {
+            @Override
+            public Class<?> getColumnClass(int column) {
+                return column == 2 ? Boolean.class : String.class;
+            }
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 2;
+            }
+        };
+
+        List<Student> students = StudentController.getStudentsByCourse((String) courseDropdown.getSelectedItem());
+        for (Student student : students) {
+            model.addRow(new Object[]{
+                    student.getId(),
+                    student.getName(),  // Make sure Student class has getName()
+                    false
+            });
+        }
+        return model;
+    }
+
+
+    // Kept finishAttendanceSession method using bulk add of attendance records
+    private void finishAttendanceSession(ActionEvent e) {
+        int confirm = JOptionPane.showConfirmDialog(
+                frame,
+                "Are you sure you want to finish this attendance session?",
+                "Confirm Finish Session",
+                JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                DefaultTableModel model = (DefaultTableModel) studentTable.getModel();
+                List<AttendanceStudent> records = new ArrayList<>();
+
+                for (int row = 0; row < model.getRowCount(); row++) {
+                    records.add(new AttendanceStudent(
+                            currentAttendanceId,
+                            (String) model.getValueAt(row, 0),
+                            (Boolean) model.getValueAt(row, 2)
+                    ));
+                }
+
+                if (AttendanceStudentController.bulkAddAttendance(records)) {
+                    JOptionPane.showMessageDialog(frame, "Attendance saved successfully!");
+                    frame.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Error saving some attendance records!");
+                }
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Error saving attendance: " + ex.getMessage());
             }
         }
     }
+
     public static void main(String[] args) {
-        new MarkAttendanceScreen();
+        SwingUtilities.invokeLater(() -> new MarkAttendanceScreen());
     }
 }

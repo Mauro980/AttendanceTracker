@@ -10,7 +10,8 @@ import java.awt.event.MouseEvent;
 
 public class MainScreen extends JFrame {
     private final Color PRIMARY_COLOR = new Color(0xC8151D); // Red background
-    private final Color TEXT_COLOR = Color.BLACK;
+    private final Color TEXT_COLOR = Color.WHITE;
+    private final Color BUTTON_COLOR = Color.BLACK;
     JButton markAttendanceButton;
     JButton trackAttendanceButton;
 
@@ -18,14 +19,16 @@ public class MainScreen extends JFrame {
     private String userRole;
 
     public MainScreen() {
-        this.userName = Brigde.loggedTeacher.getName();
-        this.userRole = Brigde.loggedTeacher.getRole();
+
+//        this.userName = Brigde.loggedTeacher.getName();
+//        this.userRole = Brigde.loggedTeacher.getRole();
         initializeUI();
     }
 
     private void initializeUI() {
         setTitle("User Dashboard");
         setSize(300, 300);
+        setBackground(PRIMARY_COLOR);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -36,6 +39,7 @@ public class MainScreen extends JFrame {
         mainPanel.add(userPanel, BorderLayout.NORTH);
 
         JPanel buttonPanel = createButtonPanel();
+        buttonPanel.setBackground(PRIMARY_COLOR);
         mainPanel.add(buttonPanel, BorderLayout.CENTER);
 
         add(mainPanel);
@@ -95,7 +99,7 @@ public class MainScreen extends JFrame {
     }
 
     private void styleButton(JButton button) {
-        button.setBackground(PRIMARY_COLOR);
+        button.setBackground(BUTTON_COLOR);
         button.setForeground(TEXT_COLOR);
         button.setFont(new Font("Arial", Font.BOLD, 14));
         button.setFocusPainted(false);

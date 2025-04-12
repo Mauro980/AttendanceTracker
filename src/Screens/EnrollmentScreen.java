@@ -25,12 +25,17 @@ public class EnrollmentScreen extends JFrame {
     private DefaultTableModel tableModel;
     private List<Student> studentsList;
     private List<Course> coursesList;
+    private final Color PRIMARY_COLOR = new Color(0xC8151D); // Red background
+    private final Color TEXT_COLOR = Color.WHITE;
+    private final Color BUTTON_COLOR = Color.BLACK;
 
     public EnrollmentScreen() {
         studentsList = new ArrayList<>();
         coursesList = new ArrayList<>();
 
         setTitle("Student Course Enrollment");
+        setForeground(TEXT_COLOR);
+        setBackground(PRIMARY_COLOR);
         setSize(600, 450);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);

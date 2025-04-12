@@ -1,9 +1,11 @@
 package DatabaseConnection;
 
 import Classes.AttendanceStudent;
+import Classes.Attendance;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class AttendanceStudentController {
@@ -12,20 +14,42 @@ public class AttendanceStudentController {
     private static final String PASSWORD = "";
 
     // Create: Add a new attendance record for a student
-    public static void addAttendance(AttendanceStudent attendanceStudent) {
-        String sql = "INSERT INTO AttendanceStudent (attendanceId, studentId, present) VALUES (?, ?, ?)";
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, attendanceStudent.getAttendanceId());
-            stmt.setString(2, attendanceStudent.getStudentId());
-            stmt.setBoolean(3, attendanceStudent.isPresent());
-            stmt.executeUpdate();
-            System.out.println("Attendance record added successfully!");
-        } catch (SQLException e) {
+    public static boolean addAttendance(Attendance attendance) {
+        String sql = "INSERT INTO Attendance (attendanceId, courseId, teacherId, date) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnect.DbConnect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, attendance.getAttendanceId());
+            pstmt.setString(2, attendance.getCourseId());
+            pstmt.setInt(3, Integer.parseInt(attendance.getTeacherId()));
+            pstmt.setTimestamp(4, Timestamp.valueOf(attendance.getDate()));
+
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    return false;
     }
 
+    public static boolean bulkAddAttendance(List<AttendanceStudent> records) {
+        String sql = "INSERT INTO AttendanceStudent (attendanceId, studentId, present) VALUES (?, ?, ?)";
+        try (Connection conn = DatabaseConnect.DbConnect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            for(AttendanceStudent record : records) {
+                pstmt.setString(1, record.getAttendanceId());
+                pstmt.setString(2, record.getStudentId());
+                pstmt.setBoolean(3, record.isPresent());
+                pstmt.addBatch();
+            }
+
+            int[] results = pstmt.executeBatch();
+            return Arrays.stream(results).allMatch(r -> r == 1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     // Retrieve a student's attendance record
     public AttendanceStudent getAttendance(String attendanceId, String studentId) {
         String sql = "SELECT * FROM AttendanceStudent WHERE attendanceId = ? AND studentId = ?";
