@@ -18,13 +18,12 @@ public class AttendanceController {
         String sql = "INSERT INTO Attendance (attendanceId, courseId, teacherId, date) VALUES (?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-
             stmt.setString(1, attendance.getAttendanceId());
             stmt.setString(2, attendance.getCourseId());
-            stmt.setString(3, attendance.getTeacherId());
-            // Convert the LocalDateTime to a Timestamp (truncate nanoseconds if necessary)
-            LocalDateTime dateTime = attendance.getDate().withNano(0);
-            stmt.setTimestamp(4, Timestamp.valueOf(dateTime));
+            stmt.setInt(3, attendance.getUserId());
+
+            // FIX: Use SQL Timestamp for LocalDateTime
+            stmt.setTimestamp(4, Timestamp.valueOf(attendance.getDate()));
 
             stmt.executeUpdate();
             System.out.println("Attendance record added successfully!");
@@ -50,7 +49,7 @@ public class AttendanceController {
                 return new Attendance(
                         rs.getString("attendanceId"),
                         rs.getString("courseId"),
-                        rs.getString("teacherId"),
+                        rs.getInt("teacherId"),
                         dateTime
                 );
             }
@@ -74,7 +73,7 @@ public class AttendanceController {
                 attendanceRecords.add(new Attendance(
                         rs.getString("attendanceId"),
                         rs.getString("courseId"),
-                        rs.getString("teacherId"),
+                        rs.getInt("teacherId"),
                         dateTime
                 ));
             }
@@ -91,7 +90,7 @@ public class AttendanceController {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, attendance.getCourseId());
-            stmt.setString(2, attendance.getTeacherId());
+            stmt.setInt(2, attendance.getUserId());
             // Convert LocalDateTime to Timestamp
             LocalDateTime dateTime = attendance.getDate().withNano(0);
             stmt.setTimestamp(3, Timestamp.valueOf(dateTime));

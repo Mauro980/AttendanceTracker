@@ -1,6 +1,10 @@
 package Screens;
+
 import Classes.*;
-import DatabaseConnection.*;
+import DatabaseConnection.AttendanceController;
+import DatabaseConnection.CourseController;
+import DatabaseConnection.StudentController;
+import DatabaseConnection.TeacherCourseController;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -18,7 +22,7 @@ public class MarkAttendanceScreen {
     private JButton finishSessionButton;
     private JTable studentTable;
     private Teacher loggedInTeacher;
-    private String currentAttendanceId;
+    private String currentAttendanceId; // common session ID
 
     public MarkAttendanceScreen() {
         loggedInTeacher = Brigde.loggedTeacher;
@@ -58,11 +62,12 @@ public class MarkAttendanceScreen {
         frame.add(controlPanel, BorderLayout.NORTH);
         frame.add(scrollPane, BorderLayout.CENTER);
 
-//        loadAllStudents();
+        loadAllStudents();
         frame.setVisible(true);
     }
 
     private void initializeStudentTable() {
+        // Initial table model with non-editable student details.
         DefaultTableModel model = new DefaultTableModel(
                 new Object[]{"Student ID", "Name", "Email", "Phone"}, 0
         ) {
@@ -77,7 +82,6 @@ public class MarkAttendanceScreen {
     private void loadTeacherCourses() {
         List<Course> courses = CourseController.getAllCourses();
         List<TeacherCourse> teacherCourses = TeacherCourseController.getCoursesByTeacher(loggedInTeacher.getUserID());
-
         for (Course course : courses) {
             for (TeacherCourse tc : teacherCourses) {
                 if (tc.getCourseID().equals(course.getId())) {
@@ -90,7 +94,6 @@ public class MarkAttendanceScreen {
     private void loadAllStudents() {
         DefaultTableModel model = (DefaultTableModel) studentTable.getModel();
         model.setRowCount(0);
-
         List<Student> students = StudentController.getAllStudents();
         for (Student student : students) {
             model.addRow(new Object[]{
@@ -110,20 +113,20 @@ public class MarkAttendanceScreen {
         }
 
         try {
-            // Generate shorter timestamp format
+            // Generate a common session attendance ID using teacher's ID and current timestamp.
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
             currentAttendanceId = loggedInTeacher.getUserID() + "_" + LocalDateTime.now().format(formatter);
 
-            // Create and save attendance record first
-            Attendance attendance = new Attendance(
+            // Create and save the session attendance record.
+            Attendance sessionAttendance = new Attendance(
                     currentAttendanceId,
                     selectedCourse,
-                    String.valueOf(loggedInTeacher.getUserID()),
-                    LocalDateTime.now()  // Store as LocalDateTime object
+                    loggedInTeacher.getUserID(),
+                    LocalDateTime.now()
             );
 
-            if (AttendanceController.addAttendance(attendance)) {
-                // Only proceed if attendance was successfully created
+            if (AttendanceController.addAttendance(sessionAttendance)) {
+                // Proceed only if the session attendance record is created.
                 DefaultTableModel newModel = createAttendanceModel();
                 studentTable.setModel(newModel);
                 finishSessionButton.setEnabled(true);
@@ -137,6 +140,7 @@ public class MarkAttendanceScreen {
     }
 
     private DefaultTableModel createAttendanceModel() {
+        // New table model with an editable "Present" checkbox column.
         DefaultTableModel model = new DefaultTableModel(
                 new Object[]{"Student ID", "Name", "Present"}, 0
         ) {
@@ -144,7 +148,6 @@ public class MarkAttendanceScreen {
             public Class<?> getColumnClass(int column) {
                 return column == 2 ? Boolean.class : String.class;
             }
-
             @Override
             public boolean isCellEditable(int row, int column) {
                 return column == 2;
@@ -155,15 +158,16 @@ public class MarkAttendanceScreen {
         for (Student student : students) {
             model.addRow(new Object[]{
                     student.getId(),
-                    student.getName(),  // Make sure Student class has getName()
+                    student.getName(),
                     false
             });
         }
         return model;
     }
 
-
-    // Kept finishAttendanceSession method using bulk add of attendance records
+    // Updated finishAttendanceSession method: For each student marked "Present",
+    // create an Attendance object using the fields: attendanceId, courseId, teacherId, date.
+    // A unique attendanceId is generated for each student by appending the student ID.
     private void finishAttendanceSession(ActionEvent e) {
         int confirm = JOptionPane.showConfirmDialog(
                 frame,
@@ -174,22 +178,41 @@ public class MarkAttendanceScreen {
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                DefaultTableModel model = (DefaultTableModel) studentTable.getModel();
-                List<AttendanceStudent> records = new ArrayList<>();
-
-                for (int row = 0; row < model.getRowCount(); row++) {
-                    records.add(new AttendanceStudent(
-                            currentAttendanceId,
-                            (String) model.getValueAt(row, 0),
-                            (Boolean) model.getValueAt(row, 2)
-                    ));
+                // Ensure any active cell editing is stopped so that the checkbox values are committed.
+                if (studentTable.getCellEditor() != null) {
+                    studentTable.getCellEditor().stopCellEditing();
                 }
 
-                if (AttendanceStudentController.bulkAddAttendance(records)) {
+                DefaultTableModel model = (DefaultTableModel) studentTable.getModel();
+                boolean allSaved = true;
+                // Loop through each student row.
+                for (int row = 0; row < model.getRowCount(); row++) {
+                    Boolean present = (Boolean) model.getValueAt(row, 2);
+                    // Only record attendance for students marked as present.
+                    if (present != null && present) {
+                        String studentId = (String) model.getValueAt(row, 0);
+                        // Generate a unique attendance record ID for the student.
+                        String uniqueAttendanceId = currentAttendanceId + "_" + studentId;
+                        // Create an Attendance object using the required fields:
+                        // attendanceId, courseId, teacherId, date.
+                        Attendance studentAttendance = new Attendance(
+                                uniqueAttendanceId,
+                                (String) courseDropdown.getSelectedItem(),
+                                loggedInTeacher.getUserID(),
+                                LocalDateTime.now()
+                        );
+                        boolean saved = AttendanceController.addAttendance(studentAttendance);
+                        if (!saved) {
+                            allSaved = false;
+                            break;
+                        }
+                    }
+                }
+                if (allSaved) {
                     JOptionPane.showMessageDialog(frame, "Attendance saved successfully!");
                     frame.dispose();
                 } else {
-                    JOptionPane.showMessageDialog(frame, "Error saving some attendance records!");
+                    JOptionPane.showMessageDialog(frame, "Error saving one or more attendance records!");
                 }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(frame, "Error saving attendance: " + ex.getMessage());

@@ -5,14 +5,14 @@ import java.time.LocalDateTime;
 public class Attendance {
     private String attendanceId;
     private String courseId;
-    private String teacherId;
+    private int UserId;
     private LocalDateTime date;
 
     // Constructor accepts LocalDateTime for the date
-    public Attendance(String attendanceId, String courseId, String teacherId, LocalDateTime date) {
+    public Attendance(String attendanceId, String courseId, int UserId, LocalDateTime date) {
         this.attendanceId = attendanceId;
         this.courseId = courseId;
-        this.teacherId = teacherId;
+        this.UserId = UserId;
         // Convert LocalDateTime to String
         this.date = date;
     }
@@ -36,12 +36,12 @@ public class Attendance {
     }
 
     // Getter and setter for teacherId
-    public String getTeacherId() {
-        return teacherId;
+    public int getUserId() {
+        return UserId;
     }
 
-    public void setTeacherId(String teacherId) {
-        this.teacherId = teacherId;
+    public void setTeacherId(int teacherId) {
+        this.UserId = teacherId;
     }
 
     // Getter and setter for date
