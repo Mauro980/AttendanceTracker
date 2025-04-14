@@ -14,6 +14,10 @@ public class Teacher extends User {
         super(name, email, role, password);
     }
 
+    public Teacher(String fullName, String email, String pass, String department, String s) {
+        super();
+    }
+
     public String getDepartment() {
         return department;
     }

@@ -21,7 +21,8 @@ public class MainScreen extends JFrame {
 
     // Custom colors for the UI
     private final Color PRIMARY_COLOR = new Color(0xC8151D); // Red
-    private final Color TEXT_COLOR = Color.BLACK;
+    private final Color TEXT_COLOR = Color.WHITE;
+    private final Color BUTTON_COLOR = Color.BLACK;
 
     // Declare UI components (buttons)
     private JButton markAttendanceButton;
@@ -50,7 +51,7 @@ public class MainScreen extends JFrame {
         initializeUI();
     }
 
-    // Setup the main screen UI layout and event listeners
+    // Set up the main screen UI layout and event listeners
     private void initializeUI() {
         setTitle("User Dashboard");
         setSize(350, 600); // Window size
@@ -59,7 +60,7 @@ public class MainScreen extends JFrame {
 
         // Main panel with BorderLayout
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.WHITE);
+        mainPanel.setBackground(PRIMARY_COLOR);
 
         // Top section: user info
         mainPanel.add(createUserPanel(), BorderLayout.NORTH);
@@ -109,7 +110,7 @@ public class MainScreen extends JFrame {
     // Creates the central button panel with all navigation buttons
     private JPanel createButtonPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBackground(Color.WHITE);
+        panel.setBackground(PRIMARY_COLOR);
 
         // Layout constraints for placing buttons vertically
         GridBagConstraints gbc = new GridBagConstraints();
@@ -146,7 +147,7 @@ public class MainScreen extends JFrame {
 
     // Apply styling to each button to match theme
     private void styleButton(JButton button) {
-        button.setBackground(PRIMARY_COLOR);
+        button.setBackground(BUTTON_COLOR);
         button.setForeground(TEXT_COLOR);
         button.setFont(new Font("Arial", Font.BOLD, 14));
         button.setFocusPainted(false);

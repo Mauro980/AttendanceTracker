@@ -5,6 +5,7 @@ import Classes.Teacher;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class TeacherController {
     private static final String URL = "jdbc:mysql://localhost:3306/attendance";
@@ -13,23 +14,63 @@ public class TeacherController {
 
     // ✅ CREATE: Add a new teacher
     public static void addTeacher(Teacher teacher) {
+        Random random = new Random();
+        int maxAttempts = 100; // Prevent infinite loop
+        int attempts = 0;
+        int randomId;
+        boolean idExists;
+
+        String sql = "INSERT INTO Teachers (id ,name, email, password, department, qualification) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            do {
+                // Generate 4-digit ID
+                randomId = 1000 + random.nextInt(9000);
+                attempts++;
+
+                // Check if ID exists in database
+                idExists = doesIdExist(conn, randomId);
+
+                if (attempts > maxAttempts) {
+                    throw new SQLException("Failed to generate unique ID after " + maxAttempts + " attempts");
+                }
+
+            } while (idExists);
+
+            stmt.setInt(1, randomId);
+            stmt.setString(2, teacher.getName());
+            stmt.setString(3, teacher.getEmail());
+            stmt.setString(4, teacher.getPassword());
+            stmt.setString(5, teacher.getDepartment());
+            stmt.setString(6, teacher.getQualification());
+            stmt.executeUpdate();
+            System.out.println("User added successfully!");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    private static boolean doesIdExist(Connection conn, int id) throws SQLException {
+        String checkSql = "SELECT id FROM Teachers WHERE id = ?";
+        try (PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+            checkStmt.setInt(1, id);
+            try (ResultSet rs = checkStmt.executeQuery()) {
+                return rs.next(); // Returns true if ID exists
+            }
+        }
+    }
+
+    public static void addTeacher(String fullName, String email, String pass, String department, String qualification) {
         String sql = "INSERT INTO Teachers (name, email, password, department, qualification) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, teacher.getName());
-            stmt.setString(2, teacher.getEmail());
-            stmt.setString(3, teacher.getPassword());
-            stmt.setString(4, teacher.getDepartment());
-            stmt.setString(5, teacher.getQualification());
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
+            stmt.setString(1, fullName);
+            stmt.setString(2, email);
+            stmt.setString(3, pass);
+            stmt.setString(4, department);
+            stmt.setString(5, qualification);
             stmt.executeUpdate();
-            System.out.println("Teacher added successfully!");
-
-            // Retrieve auto-generated ID
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                teacher.setUserID(rs.getInt(1));
-            }
+            System.out.println("User added successfully!");
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -1,8 +1,11 @@
 package Screens;
 
 import Classes.Brigde;
+import Classes.Teacher;
 import Classes.User;
+import DatabaseConnection.TeacherController;
 import DatabaseConnection.UserController;
+import java.util.Random;
 
 import javax.swing.*;
 import javax.swing.border.AbstractBorder;
@@ -186,6 +189,9 @@ public class SignUpScreen extends JFrame {
         String email = txtEmail.getText();
         String pass = new String(txtPassword.getPassword());
         String pass2 = new String(txtPasswordConfirm.getPassword());
+        String[] departments= {"Mathematics", "Computer Science"};
+        String[] qualification = {"PHD", "Masters"};
+        int[] ids = {1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010};
 
         if(fullName.isEmpty() || email.isEmpty()){
             JOptionPane.showMessageDialog(this,"Check your entry and try again");
@@ -193,13 +199,19 @@ public class SignUpScreen extends JFrame {
             if(!pass.equals(pass2)){
                 JOptionPane.showMessageDialog(this,"Password does not Match. Try again");
             }else{
-                User user = new User(fullName,email, Brigde.roles[1],pass );
-                UserController.createUser(user);
-                JOptionPane.showMessageDialog(this,"User Added Sucessfuly");
+                Random rand = new Random();
+                int randomIndex = rand.nextInt(departments.length);
+                int randomIndex2 = rand.nextInt(qualification.length);
+                int randomIndex3 = rand.nextInt(ids.length);
+                Teacher teacher = new Teacher(ids[randomIndex3],fullName, email, pass,departments[randomIndex], qualification[randomIndex2]);
+                TeacherController.addTeacher(teacher);
+                JOptionPane.showMessageDialog(this,"User Added Successfully");
                 txtName.setText("");
                 txtPasswordConfirm.setText("");
                 txtEmail.setText("");
                 txtPassword.setText("");
+                LoginScreen login = new LoginScreen();
+                login.setVisible(true);
 
             }
         }
